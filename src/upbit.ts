@@ -9,11 +9,12 @@ export default class Upbit {
   ) {}
 
   static async getCurrentPrice(markets: string | string[]) {
-    return await axios.get(
+    const resp = await axios.get(
       `https://api.upbit.com/v1/ticker?markets=${markets.toString()}`,
       {
         headers: { accept: "application/json" },
       }
     );
+    return resp.data;
   }
 }
