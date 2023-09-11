@@ -27,18 +27,19 @@ export default class Upbit {
 
     const lastCandle = data.at(-1);
 
-    if (!lastCandle) {
-      return result;
+    const remainCount = count - data.length;
+
+    const stack = [...result, ...data];
+
+    if (!lastCandle || remainCount < 1) {
+      return stack;
     }
 
     const previousDate = moment(lastCandle.candle_date_time_kst)
       .subtract(1, "days")
       .toISOString();
 
-    return this.getDayCandles(market, count, previousDate, [
-      ...result,
-      ...data,
-    ]);
+    return this.getDayCandles(market, remainCount, previousDate, stack);
   }
 
   static async getCurrentPrice(markets: string | string[]) {
