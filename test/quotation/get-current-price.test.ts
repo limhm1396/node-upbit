@@ -38,7 +38,7 @@ describe("getCurrentPrice", () => {
   });
 
   it("will pass", async () => {
-    const data = await Upbit.getCurrentPrice("KRW-BTC");
+    const data = await Upbit.getCurrentPrice(["KRW-BTC"]);
     expect(data).toMatchSnapshot();
   });
 });

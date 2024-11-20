@@ -7,7 +7,7 @@
   "scripts": {
     "test": "jest",
     "build": "rm -rf dist && tsc",
-    "preinstall": "yarn build"
+    "postinstall": "yarn build"
   },
   "keywords": [],
   "author": "",
@@ -15,12 +15,12 @@
   "devDependencies": {
     "@types/jest": "^29.5.4",
     "jest": "^29.6.4",
-    "ts-jest": "^29.1.1",
-    "typescript": "^5.2.2"
+    "ts-jest": "^29.1.1"
   },
   "dependencies": {
     "axios": "^1.5.0",
-    "moment": "^2.29.4"
+    "moment": "^2.29.4",
+    "typescript": "^5.6.3"
   },
   "jest": {
     "preset": "ts-jest",

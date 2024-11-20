@@ -1,6 +1,6 @@
 import axios from "axios";
 import moment from "moment";
-import { GetCurrentPrice, GetDayCandles } from "./types";
+import { CurrentPrice, DaysCandle, Market } from "./types";
 
 const HOST = "https://api.upbit.com/v1";
 
@@ -18,9 +18,9 @@ export default class Upbit {
     market: string,
     count = 1,
     date = moment().toISOString(),
-    result: GetDayCandles[] = []
-  ): Promise<GetDayCandles[]> {
-    const { data } = await axios.get<GetDayCandles[]>(
+    result: DaysCandle[] = []
+  ): Promise<DaysCandle[]> {
+    const { data } = await axios.get<DaysCandle[]>(
       `${HOST}/candles/days?market=${market}&to=${date}&count=${count}`,
       COMMON_CONFIG
     );
@@ -42,9 +42,17 @@ export default class Upbit {
     return this.getDayCandles(market, remainCount, previousDate, stack);
   }
 
-  static async getCurrentPrice(markets: string | string[]) {
-    const { data } = await axios.get<GetCurrentPrice>(
-      `${HOST}/ticker?markets=${markets.toString()}`,
+  static async getCurrentPrice(markets: String[]) {
+    const { data } = await axios.get<CurrentPrice[]>(
+      `${HOST}/ticker?markets=${markets.join(",")}`,
+      COMMON_CONFIG
+    );
+    return data;
+  }
+
+  static async getMarkets() {
+    const { data } = await axios.get<Market[]>(
+      `${HOST}/market/all`,
       COMMON_CONFIG
     );
     return data;
