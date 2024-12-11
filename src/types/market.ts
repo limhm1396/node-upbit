@@ -1,16 +1,16 @@
 export type Market = {
-  market: String;
-  korean_name: String;
-  english_name: String;
-  market_warning: String;
-  market_event: {
-    warning: Boolean;
+  market: string;
+  korean_name: string;
+  english_name: string;
+  market_warning: string;
+  market_event?: {
+    warning: boolean;
     caution: {
-      PRICE_FLUCTUATIONS: Boolean;
-      TRADING_VOLUME_SOARING: Boolean;
-      DEPOSIT_AMOUNT_SOARING: Boolean;
-      GLOBAL_PRICE_DIFFERENCES: Boolean;
-      CONCENTRATION_OF_SMALL_ACCOUNTS: Boolean;
+      PRICE_FLUCTUATIONS: boolean;
+      TRADING_VOLUME_SOARING: boolean;
+      DEPOSIT_AMOUNT_SOARING: boolean;
+      GLOBAL_PRICE_DIFFERENCES: boolean;
+      CONCENTRATION_OF_SMALL_ACCOUNTS: boolean;
     };
   };
 };
