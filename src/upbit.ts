@@ -50,6 +50,14 @@ export default class Upbit {
     return data;
   }
 
+  static async getCurrentPrices(quote_currencies: string) {
+    const { data } = await axios.get<CurrentPrice[]>(
+      `${HOST}/ticker/all?quote_currencies=${quote_currencies}`,
+      COMMON_CONFIG
+    );
+    return data;
+  }
+
   static async getMarkets() {
     const { data } = await axios.get<Market[]>(
       `${HOST}/market/all`,
