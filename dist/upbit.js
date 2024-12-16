@@ -9,6 +9,7 @@ const HOST = "https://api.upbit.com/v1";
 const COMMON_CONFIG = {
     headers: { accept: "application/json" },
 };
+const sleep = (s) => new Promise((r) => setTimeout(r, s * 1000));
 class Upbit {
     accessKey;
     secretKey;
@@ -17,6 +18,7 @@ class Upbit {
         this.secretKey = secretKey;
     }
     static async getDayCandles(market, count = 1, date = (0, moment_1.default)().toISOString(), result = []) {
+        await sleep(0.125);
         const { data } = await axios_1.default.get(`${HOST}/candles/days?market=${market}&to=${date}&count=${count}`, COMMON_CONFIG);
         const lastCandle = data.at(-1);
         const remainCount = count - data.length;

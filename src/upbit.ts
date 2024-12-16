@@ -8,6 +8,8 @@ const COMMON_CONFIG = {
   headers: { accept: "application/json" },
 };
 
+const sleep = (s: number) => new Promise((r) => setTimeout(r, s * 1000));
+
 export default class Upbit {
   constructor(
     private readonly accessKey?: string,
@@ -20,6 +22,8 @@ export default class Upbit {
     date = moment().toISOString(),
     result: DaysCandle[] = []
   ): Promise<DaysCandle[]> {
+    await sleep(0.125);
+
     const { data } = await axios.get<DaysCandle[]>(
       `${HOST}/candles/days?market=${market}&to=${date}&count=${count}`,
       COMMON_CONFIG
