@@ -5,6 +5,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
 const moment_1 = __importDefault(require("moment"));
+const jsonwebtoken_1 = require("jsonwebtoken");
+const uuid_1 = require("uuid");
+const querystring_1 = require("querystring");
+const crypto_1 = require("crypto");
 const HOST = "https://api.upbit.com/v1";
 const COMMON_CONFIG = {
     headers: { accept: "application/json" },
@@ -16,6 +20,57 @@ class Upbit {
     constructor(accessKey, secretKey) {
         this.accessKey = accessKey;
         this.secretKey = secretKey;
+    }
+    async getAccounts() {
+        const token = (0, jsonwebtoken_1.sign)({ access_key: this.accessKey, nonce: (0, uuid_1.v4)() }, this.secretKey);
+        const response = await axios_1.default.request({
+            method: "GET",
+            url: HOST + "/accounts",
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
+    }
+    async invest(body) {
+        const query = (0, querystring_1.encode)(body);
+        const hash = (0, crypto_1.createHash)("sha512");
+        const queryHash = hash.update(query, "utf-8").digest("hex");
+        const token = (0, jsonwebtoken_1.sign)({
+            access_key: this.accessKey,
+            nonce: (0, uuid_1.v4)(),
+            query_hash: queryHash,
+            query_hash_alg: "SHA512",
+        }, this.secretKey);
+        try {
+            await axios_1.default.request({
+                method: "POST",
+                url: HOST + "/orders",
+                headers: {
+                    accept: "application/json",
+                    "content-type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                data: body,
+            });
+        }
+        catch (error) {
+            console.log("error:", error.response?.data);
+        }
+    }
+    async sell(market, amount) {
+        await this.invest({
+            market,
+            side: "ask",
+            price: amount.toString(),
+            ord_type: "market",
+        });
+    }
+    async buy(market, amount) {
+        await this.invest({
+            market,
+            side: "bid",
+            price: amount.toString(),
+            ord_type: "price",
+        });
     }
     static async getDayCandles(market, count = 1, date = (0, moment_1.default)().toISOString(), result = []) {
         await sleep(0.125);

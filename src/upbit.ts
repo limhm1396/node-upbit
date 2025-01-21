@@ -1,6 +1,11 @@
 import axios from "axios";
 import moment from "moment";
 import { CurrentPrice, DaysCandle, Market } from "./types";
+import { sign } from "jsonwebtoken";
+import { v4 } from "uuid";
+import { Account } from "./types/account";
+import { encode } from "querystring";
+import { createHash } from "crypto";
 
 const HOST = "https://api.upbit.com/v1";
 
@@ -15,6 +20,70 @@ export default class Upbit {
     private readonly accessKey?: string,
     private readonly secretKey?: string
   ) {}
+
+  async getAccounts(): Promise<Account[]> {
+    const token = sign(
+      { access_key: this.accessKey, nonce: v4() },
+      this.secretKey!
+    );
+
+    const response = await axios.request({
+      method: "GET",
+      url: HOST + "/accounts",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    return response.data;
+  }
+
+  async invest(body: any) {
+    const query = encode(body);
+    const hash = createHash("sha512");
+    const queryHash = hash.update(query, "utf-8").digest("hex");
+
+    const token = sign(
+      {
+        access_key: this.accessKey,
+        nonce: v4(),
+        query_hash: queryHash,
+        query_hash_alg: "SHA512",
+      },
+      this.secretKey!
+    );
+
+    try {
+      await axios.request({
+        method: "POST",
+        url: HOST + "/orders",
+        headers: {
+          accept: "application/json",
+          "content-type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        data: body,
+      });
+    } catch (error: any) {
+      console.log("error:", error.response?.data);
+    }
+  }
+
+  async sell(market: string, amount: number) {
+    await this.invest({
+      market,
+      side: "ask",
+      price: amount.toString(),
+      ord_type: "market",
+    });
+  }
+
+  async buy(market: string, amount: number) {
+    await this.invest({
+      market,
+      side: "bid",
+      price: amount.toString(),
+      ord_type: "price",
+    });
+  }
 
   static async getDayCandles(
     market: string,
