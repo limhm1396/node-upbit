@@ -9,11 +9,11 @@ const jsonwebtoken_1 = require("jsonwebtoken");
 const uuid_1 = require("uuid");
 const querystring_1 = require("querystring");
 const crypto_1 = require("crypto");
+const utils_1 = require("./utils");
 const HOST = "https://api.upbit.com/v1";
 const COMMON_CONFIG = {
     headers: { accept: "application/json" },
 };
-const sleep = (s) => new Promise((r) => setTimeout(r, s * 1000));
 class Upbit {
     accessKey;
     secretKey;
@@ -56,24 +56,28 @@ class Upbit {
             console.log("error:", error.response?.data);
         }
     }
-    async sell(market, amount) {
+    async sell(market, volume, price) {
+        const ord_type = price ? "limit" : "market";
         await this.invest({
             market,
             side: "ask",
-            price: amount.toString(),
-            ord_type: "market",
+            volume: volume.toString(),
+            price: price?.toString() || null,
+            ord_type,
         });
     }
-    async buy(market, amount) {
+    async buy(market, price, volume) {
+        const ord_type = volume ? "limit" : "price";
         await this.invest({
             market,
             side: "bid",
-            price: amount.toString(),
-            ord_type: "price",
+            price: price.toString(),
+            volume: volume?.toString() || null,
+            ord_type,
         });
     }
     static async getDayCandles(market, count = 1, date = (0, moment_1.default)().toISOString(), result = []) {
-        await sleep(0.125);
+        await (0, utils_1.sleep)(0.125);
         const { data } = await axios_1.default.get(`${HOST}/candles/days?market=${market}&to=${date}&count=${count}`, COMMON_CONFIG);
         const lastCandle = data.at(-1);
         const remainCount = count - data.length;

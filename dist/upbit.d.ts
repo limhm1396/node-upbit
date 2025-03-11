@@ -6,8 +6,8 @@ export default class Upbit {
     constructor(accessKey?: string | undefined, secretKey?: string | undefined);
     getAccounts(): Promise<Account[]>;
     invest(body: any): Promise<void>;
-    sell(market: string, amount: number): Promise<void>;
-    buy(market: string, amount: number): Promise<void>;
+    sell(market: string, volume: number, price?: number): Promise<void>;
+    buy(market: string, price: number, volume?: number): Promise<void>;
     static getDayCandles(market: string, count?: number, date?: string, result?: DaysCandle[]): Promise<DaysCandle[]>;
     static getCurrentPrice(markets: String[]): Promise<CurrentPrice[]>;
     static getCurrentPrices(quote_currencies: string): Promise<CurrentPrice[]>;

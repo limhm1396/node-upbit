@@ -6,14 +6,13 @@ import { v4 } from "uuid";
 import { Account } from "./types/account";
 import { encode } from "querystring";
 import { createHash } from "crypto";
+import { sleep } from "./utils";
 
 const HOST = "https://api.upbit.com/v1";
 
 const COMMON_CONFIG = {
   headers: { accept: "application/json" },
 };
-
-const sleep = (s: number) => new Promise((r) => setTimeout(r, s * 1000));
 
 export default class Upbit {
   constructor(
@@ -67,21 +66,25 @@ export default class Upbit {
     }
   }
 
-  async sell(market: string, amount: number) {
+  async sell(market: string, volume: number, price?: number) {
+    const ord_type = price ? "limit" : "market";
     await this.invest({
       market,
       side: "ask",
-      price: amount.toString(),
-      ord_type: "market",
+      volume: volume.toString(),
+      price: price?.toString() || null,
+      ord_type,
     });
   }
 
-  async buy(market: string, amount: number) {
+  async buy(market: string, price: number, volume?: number) {
+    const ord_type = volume ? "limit" : "price";
     await this.invest({
       market,
       side: "bid",
-      price: amount.toString(),
-      ord_type: "price",
+      price: price.toString(),
+      volume: volume?.toString() || null,
+      ord_type,
     });
   }
 
